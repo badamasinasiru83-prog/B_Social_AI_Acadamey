@@ -11,34 +11,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract project
-        run: |
-          unzip -q B_Social_AI_Academy_v1.zip -d project
-          echo "Files extracted successfully"
-
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Find and build project
+      - name: Extract project and fix Gradle
         run: |
-          GRADLEW=$(find project -type f -name gradlew | head -n 1)
-          echo "Found gradlew: $GRADLEW"
-
-          if [ -z "$GRADLEW" ]; then
-            echo "ERROR: gradlew not found"
-            find project -maxdepth 4 -type f
-            exit 1
+          mkdir project
+          unzip -o B_Social_AI_Academy_v1.zip -d project
+          cd project
+          
+          # Inda muke neman gradle wrapper da kanta
+          if [ ! -f "gradlew" ]; then
+            echo "Gradlew not found, generating wrapper..."
+            gradle wrapper
           fi
+          
+          chmod +x gradlew
 
-          chmod +x "$GRADLEW"
-          cd "$(dirname "$GRADLEW")"
-          ./gradlew assembleDebug
+      - name: Build APK
+        run: |
+          cd project
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: B-Social-AI-Academy-APK
-          path: project/**/app/build/outputs/apk/debug/app-debug.apk
+          name: app-debug
+          path: project/app/build/outputs/apk/debug/app-debug.apk
+          
