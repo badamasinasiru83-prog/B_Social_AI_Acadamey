@@ -17,28 +17,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Extract project and fix Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.2'
+
+      - name: Extract project and build
         run: |
           mkdir project
           unzip -o B_Social_AI_Academy_v1.zip -d project
           cd project
-          
-          # Inda muke neman gradle wrapper da kanta
-          if [ ! -f "gradlew" ]; then
-            echo "Gradlew not found, generating wrapper..."
-            gradle wrapper
-          fi
-          
-          chmod +x gradlew
-
-      - name: Build APK
-        run: |
-          cd project
-          ./gradlew assembleDebug --stacktrace
+          gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: project/app/build/outputs/apk/debug/app-debug.apk
-          
