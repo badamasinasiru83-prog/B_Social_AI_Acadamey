@@ -25,13 +25,14 @@ jobs:
         cd project
         chmod +x gradlew
 
-    - name: Build APK with Gradle
+    - name: Build APK using Gradle Wrapper
       run: |
         cd project
-        ./gradlew assembleDebug
-
+        ./gradlew assembleDebug --stacktrace
+        
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: B-Social-AI-Academy-APK
         path: project/app/build/outputs/apk/debug/app-debug.apk
+        
